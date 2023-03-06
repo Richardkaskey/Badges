@@ -1,0 +1,103 @@
+/**
+ * @name Badges
+ * @version 1.0.0
+ * @description Allows you to locally assign badges to users through the user context menu on Discord.
+ * @website https://github.com/RichardKaskey/Badges
+ * @source https://raw.githubusercontent.com/RichardKaskey/Badges/main/Badges.plugin.js
+ * @updateUrl https://raw.githubusercontent.com/RichardKaskey/Badges/main/Badges.plugin.js
+ * @author Richard
+ * @license MIT
+ */
+
+const plugin = (() => {
+  const getUserContextMenu = () => {
+    return document.querySelector(".userContextMenu-uoJTbz");
+  };
+
+  const createBadge = (badgeName, badgeImage) => {
+    const badge = document.createElement("div");
+    badge.className = "badge-3PwnCY";
+    badge.style.backgroundImage = `url(${badgeImage})`;
+
+    const badgeTooltip = document.createElement("div");
+    badgeTooltip.className = "tooltip-2QfLtc tooltipTop-3ARrEK tooltipBlack-PPG47z";
+    badgeTooltip.textContent = badgeName;
+
+    badge.appendChild(badgeTooltip);
+    return badge;
+  };
+
+  const addBadgeToUserContextMenu = (userId, badgeName, badgeImage) => {
+    const userContextMenu = getUserContextMenu();
+
+    if (!userContextMenu) {
+      return;
+    }
+
+    const badge = createBadge(badgeName, badgeImage);
+
+    userContextMenu.appendChild(badge);
+
+    const userPopout = document.querySelector(`.userPopout-4pfA0d[data-user-id="${userId}"]`);
+
+    if (userPopout) {
+      const infoSection = userPopout.querySelector(".userPopoutInfoSection-2i_24n");
+
+      if (infoSection) {
+        const itemGroup = infoSection.querySelector(".itemGroup-1tL0uz");
+
+        if (itemGroup) {
+          itemGroup.appendChild(badge.cloneNode(true));
+        }
+      }
+    }
+  };
+
+  return class Badges {
+    getName() {
+      return "Badges";
+    }
+
+    getDescription() {
+      return "Allows you to locally assign badges to users through the user context menu on Discord.";
+    }
+
+    getVersion() {
+      return "1.0.0";
+    }
+
+    getAuthor() {
+      return "Richard";
+    }
+
+    load() {
+      this.log("Loaded");
+    }
+
+    start() {
+      this.log("Started");
+
+      const badgeName = "Badge Name";
+      const badgeImage = "https://example.com/badge.png";
+
+      document.addEventListener("contextmenu", (e) => {
+        const userContextMenuItem = e.target.closest(".userContextMenuItem-1XYaWf");
+
+        if (userContextMenuItem) {
+          const userId = userContextMenuItem.getAttribute("data-user-id");
+          addBadgeToUserContextMenu(userId, badgeName, badgeImage);
+        }
+      });
+    }
+
+    stop() {
+      this.log("Stopped");
+    }
+
+    log(message) {
+      console.log(`[${this.getName()}] ${message}`);
+    }
+  };
+})();
+
+module.exports = plugin;
